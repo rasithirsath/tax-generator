@@ -1,0 +1,1270 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GREENWORLD – Tax Invoice</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      :root {
+        --green: #2c5f2e;
+        --green-lt: #3d7a40;
+        --green-bg: #eef4ee;
+        --charcoal: #1a1a1a;
+        --mid: #4a4a4a;
+        --light: #7a7a7a;
+        --rule: #d0d0d0;
+        --row-alt: #f7f8f7;
+        --white: #ffffff;
+      }
+
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Inter", Arial, sans-serif;
+        font-size: 11px;
+        color: var(--charcoal);
+        background: #e8e8e8;
+        line-height: 1.5;
+      }
+
+      /* ─── SCREEN TOOLBAR ─────────────────────────────────────────── */
+      .toolbar {
+        background: var(--charcoal);
+        color: #fff;
+        padding: 10px 24px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 12px;
+        font-weight: 500;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .toolbar .tbr-title {
+        flex: 1;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .toolbar button {
+        padding: 7px 18px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 11.5px;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        transition: background 0.15s;
+      }
+      .btn-add {
+        background: var(--green-lt);
+        color: #fff;
+      }
+      .btn-add:hover {
+        background: var(--green);
+      }
+      .btn-print {
+        background: #fff;
+        color: var(--charcoal);
+      }
+      .btn-print:hover {
+        background: #eee;
+      }
+      .btn-clear {
+        background: #555;
+        color: #fff;
+      }
+      .btn-clear:hover {
+        background: #444;
+      }
+
+      /* ─── A4 WRAPPER ─────────────────────────────────────────────── */
+      .page-wrap {
+        padding: 28px 20px 40px;
+      }
+
+      .invoice {
+        width: 210mm;
+        min-height: 297mm;
+        background: var(--white);
+        margin: 0 auto;
+        padding: 0;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.18);
+        display: flex;
+        flex-direction: column;
+      }
+
+      /* ─── HEADER ─────────────────────────────────────────────────── */
+      .inv-header {
+        border-bottom: 3px solid var(--green);
+        padding: 22px 28px 18px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 16px;
+        align-items: start;
+      }
+
+      .logo-block {
+        width: 70px;
+        height: 70px;
+        border: 1.5px dashed var(--rule);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--light);
+        font-size: 8px;
+        font-weight: 500;
+        text-align: center;
+        letter-spacing: 0.04em;
+        flex-shrink: 0;
+      }
+      .logo-icon {
+        width: 26px;
+        height: 26px;
+        margin-bottom: 4px;
+        opacity: 0.45;
+      }
+
+      .company-info {
+      }
+      .company-name {
+        font-size: 17px;
+        font-weight: 700;
+        color: var(--green);
+        letter-spacing: 0.02em;
+        line-height: 1.2;
+      }
+      .company-legal {
+        font-size: 9px;
+        font-weight: 500;
+        color: var(--mid);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .company-detail {
+        font-size: 10px;
+        color: var(--mid);
+        line-height: 1.65;
+      }
+      .company-detail .ph {
+        color: var(--light);
+        font-style: italic;
+      }
+
+      .doc-title-block {
+        text-align: right;
+        align-self: start;
+      }
+      .doc-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--green);
+        letter-spacing: 0.08em;
+        line-height: 1;
+        text-transform: uppercase;
+        border: 2px solid var(--green);
+        display: inline-block;
+        padding: 6px 14px;
+      }
+      .doc-subtitle {
+        font-size: 9px;
+        color: var(--light);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-top: 5px;
+        font-weight: 500;
+      }
+
+      /* ─── INFO BAND ──────────────────────────────────────────────── */
+      .inv-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        border-bottom: 1px solid var(--rule);
+      }
+
+      .info-col {
+        padding: 14px 28px;
+      }
+      .info-col + .info-col {
+        border-left: 1px solid var(--rule);
+        background: var(--row-alt);
+      }
+      .info-col h3 {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--green);
+        border-bottom: 1px solid var(--green-bg);
+        padding-bottom: 5px;
+        margin-bottom: 8px;
+      }
+
+      .field-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 2.5px 0;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .field-row:last-child {
+        border-bottom: none;
+      }
+      .field-label {
+        font-size: 10px;
+        color: var(--mid);
+        font-weight: 500;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .field-value {
+        font-size: 10px;
+        color: var(--charcoal);
+        font-weight: 600;
+        text-align: right;
+        flex: 1;
+      }
+      .field-value input,
+      .field-value select {
+        font-family: inherit;
+        font-size: 10px;
+        font-weight: 600;
+        color: var(--charcoal);
+        border: none;
+        border-bottom: 1px dashed #ccc;
+        background: transparent;
+        text-align: right;
+        width: 100%;
+        outline: none;
+        padding: 0;
+      }
+      .field-value input:focus,
+      .field-value select:focus {
+        border-bottom-color: var(--green);
+      }
+      .field-value input.ph-text {
+        color: var(--light);
+        font-style: italic;
+        font-weight: 400;
+      }
+
+      /* ─── TABLE ──────────────────────────────────────────────────── */
+      .inv-table-wrap {
+        padding: 0 0;
+        flex: 1;
+      }
+
+      .inv-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 9.5px;
+      }
+      .inv-table thead tr {
+        background: var(--green);
+        color: #fff;
+      }
+      .inv-table thead th {
+        padding: 7px 6px;
+        text-align: center;
+        font-weight: 600;
+        font-size: 8.5px;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+      }
+      .inv-table thead th.left {
+        text-align: left;
+        padding-left: 10px;
+      }
+      .inv-table thead th.right {
+        text-align: right;
+        padding-right: 8px;
+      }
+
+      .inv-table tbody tr:nth-child(even) {
+        background: var(--row-alt);
+      }
+      .inv-table tbody tr:hover {
+        background: #eef6ee;
+      }
+
+      .inv-table tbody td {
+        padding: 5px 6px;
+        border-bottom: 1px solid #ebebeb;
+        vertical-align: middle;
+        text-align: center;
+      }
+      .inv-table tbody td.left {
+        text-align: left;
+        padding-left: 10px;
+      }
+      .inv-table tbody td.right {
+        text-align: right;
+        padding-right: 8px;
+      }
+      .inv-table tbody td.num {
+        color: var(--mid);
+        font-weight: 500;
+        font-size: 9px;
+      }
+
+      .inv-table tbody td input,
+      .inv-table tbody td select {
+        font-family: inherit;
+        font-size: 9.5px;
+        color: var(--charcoal);
+        border: none;
+        border-bottom: 1px dashed #ccc;
+        background: transparent;
+        outline: none;
+        width: 100%;
+        padding: 0;
+      }
+      .inv-table tbody td input[type="number"] {
+        text-align: right;
+      }
+      .inv-table tbody td input:focus,
+      .inv-table tbody td select:focus {
+        border-bottom-color: var(--green);
+        background: #fff;
+      }
+
+      .del-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #bbb;
+        font-size: 13px;
+        line-height: 1;
+        padding: 0 4px;
+        font-weight: 700;
+      }
+      .del-btn:hover {
+        color: #c0392b;
+      }
+
+      /* ─── TOTALS ─────────────────────────────────────────────────── */
+      .inv-totals {
+        display: flex;
+        justify-content: flex-end;
+        padding: 0 28px 0 28px;
+        border-top: 2px solid var(--green);
+      }
+
+      .totals-table {
+        width: 290px;
+      }
+      .totals-table tr td {
+        padding: 4px 0;
+        font-size: 10px;
+        border-bottom: 1px solid #f0f0f0;
+      }
+      .totals-table tr:last-child td {
+        border-bottom: none;
+      }
+      .totals-table .tot-label {
+        color: var(--mid);
+        font-weight: 500;
+        padding-right: 16px;
+      }
+      .totals-table .tot-val {
+        text-align: right;
+        font-weight: 600;
+        color: var(--charcoal);
+        white-space: nowrap;
+      }
+      .totals-table tr.tot-grand td {
+        background: var(--green);
+        color: #fff;
+        font-weight: 700;
+        font-size: 11px;
+        padding: 7px 8px;
+        border-bottom: none;
+      }
+      .totals-table tr.tot-grand .tot-val {
+        color: #fff;
+      }
+
+      /* ─── AMOUNT IN WORDS ────────────────────────────────────────── */
+      .inv-words {
+        margin: 8px 28px 0;
+        padding: 7px 12px;
+        background: var(--green-bg);
+        border-left: 3px solid var(--green);
+        font-size: 9.5px;
+      }
+      .inv-words .wlabel {
+        font-size: 8.5px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--green);
+        margin-bottom: 2px;
+      }
+      .inv-words .wtext {
+        font-weight: 600;
+        color: var(--charcoal);
+        font-style: italic;
+      }
+
+      /* ─── BANK + TERMS ───────────────────────────────────────────── */
+      .inv-bank-terms {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        border-top: 1px solid var(--rule);
+        margin-top: 12px;
+      }
+      .bank-col {
+        padding: 12px 28px;
+      }
+      .bank-col + .bank-col {
+        border-left: 1px solid var(--rule);
+      }
+      .bank-col h3 {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--green);
+        border-bottom: 1px solid var(--green-bg);
+        padding-bottom: 5px;
+        margin-bottom: 8px;
+      }
+      .bank-field {
+        display: flex;
+        gap: 6px;
+        padding: 2px 0;
+        font-size: 9.5px;
+      }
+      .bank-field .bl {
+        color: var(--mid);
+        font-weight: 500;
+        white-space: nowrap;
+        min-width: 90px;
+      }
+      .bank-field .bv {
+        color: var(--charcoal);
+        font-weight: 500;
+        color: var(--light);
+        font-style: italic;
+      }
+
+      /* ─── REMARKS ────────────────────────────────────────────────── */
+      .inv-remarks {
+        border-top: 1px solid var(--rule);
+        padding: 10px 28px;
+      }
+      .inv-remarks h3 {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--green);
+        margin-bottom: 6px;
+      }
+      .remarks-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+      }
+      .remark-item {
+        font-size: 9.5px;
+      }
+      .remark-item .rl {
+        font-weight: 600;
+        color: var(--mid);
+        display: block;
+        font-size: 8.5px;
+        letter-spacing: 0.04em;
+        margin-bottom: 1px;
+      }
+      .remark-item .rv {
+        color: var(--light);
+        font-style: italic;
+      }
+      .remarks-notes {
+        margin-top: 6px;
+        font-size: 9.5px;
+        color: var(--light);
+        font-style: italic;
+        border-top: 1px dashed #e0e0e0;
+        padding-top: 5px;
+      }
+
+      /* ─── SIGNATORY ──────────────────────────────────────────────── */
+      .inv-sign {
+        border-top: 1px solid var(--rule);
+        padding: 12px 28px 20px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .sign-box {
+        width: 200px;
+        text-align: center;
+      }
+      .sign-for {
+        font-size: 9px;
+        font-weight: 700;
+        color: var(--green);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+      .sign-company {
+        font-size: 9.5px;
+        font-weight: 600;
+        color: var(--charcoal);
+        margin-bottom: 10px;
+      }
+      .sign-area {
+        border: 1px dashed var(--rule);
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--light);
+        font-size: 8.5px;
+        font-style: italic;
+        margin-bottom: 6px;
+      }
+      .sign-lines {
+        font-size: 9px;
+        color: var(--mid);
+        line-height: 1.9;
+      }
+      .sign-lines div {
+        border-bottom: 1px solid var(--charcoal);
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 1px;
+      }
+
+      /* ─── FOOTER ─────────────────────────────────────────────────── */
+      .inv-footer {
+        background: var(--green);
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 8px;
+        text-align: center;
+        padding: 6px 28px;
+        letter-spacing: 0.04em;
+      }
+
+      /* ─── PRINT ──────────────────────────────────────────────────── */
+      @media print {
+        body {
+          background: #fff;
+        }
+        .toolbar {
+          display: none !important;
+        }
+        .page-wrap {
+          padding: 0;
+        }
+        .invoice {
+          box-shadow: none;
+          width: 100%;
+          min-height: 0;
+        }
+        .del-btn {
+          display: none !important;
+        }
+        input,
+        select {
+          border-bottom: none !important;
+        }
+        @page {
+          size: A4 portrait;
+          margin: 10mm 12mm;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ─── TOOLBAR ──────────────────────────────────────────────── -->
+    <div class="toolbar">
+      <span class="tbr-title">GREENWORLD — Tax Invoice Template</span>
+      <button class="btn-add" onclick="addRow()">+ Add Line Item</button>
+      <button class="btn-clear" onclick="clearForm()">Clear Form</button>
+      <button class="btn-print" onclick="window.print()">
+        🖨 Print / Save PDF
+      </button>
+    </div>
+
+    <!-- ─── A4 PAGE ──────────────────────────────────────────────── -->
+    <div class="page-wrap">
+      <div class="invoice" id="invoice">
+        <!-- HEADER -->
+        <div class="inv-header">
+          <div class="logo-block">
+            <svg
+              class="logo-icon"
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <circle
+                cx="20"
+                cy="20"
+                r="18"
+                stroke="#2C5F2E"
+                stroke-width="2"
+              />
+              <path
+                d="M20 30 C20 30 10 22 10 15 C10 10 15 7 20 10 C25 7 30 10 30 15 C30 22 20 30 20 30Z"
+                fill="#2C5F2E"
+                opacity=".5"
+              />
+            </svg>
+            LOGO PLACEHOLDER
+          </div>
+
+          <div class="company-info">
+            <div class="company-name">GREENWORLD</div>
+            <div class="company-legal">[ENTER LEGAL COMPANY NAME]</div>
+            <div class="company-detail">
+              <span class="ph"
+                >[REGISTERED BUSINESS ADDRESS, BUILDING / FLOOR / UNIT]</span
+              ><br />
+              <span class="ph"
+                >[AREA / DISTRICT], Dubai, United Arab Emirates</span
+              ><br />
+              Tel: <span class="ph">[+971 X XXXX XXXX]</span> &nbsp;|&nbsp; Mob:
+              <span class="ph">[+971 XX XXX XXXX]</span><br />
+              Email: <span class="ph">[info@greenworld.ae]</span> &nbsp;|&nbsp;
+              Web: <span class="ph">[www.greenworld.ae]</span><br />
+              TRN:
+              <strong><span class="ph">[ENTER UAE TRN]</span></strong>
+              &nbsp;|&nbsp; Lic. No.:
+              <span class="ph">[ENTER LICENCE NUMBER]</span>
+            </div>
+          </div>
+
+          <div class="doc-title-block">
+            <div class="doc-title">TAX INVOICE</div>
+          </div>
+        </div>
+        <!-- /inv-header -->
+
+        <!-- INFO BAND -->
+        <div class="inv-info">
+          <!-- Invoice Details -->
+          <div class="info-col">
+            <h3>Invoice Details</h3>
+
+            <div class="field-row">
+              <span class="field-label">Invoice No.</span>
+              <span class="field-value"
+                ><input
+                  id="inv_no"
+                  type="text"
+                  value="GW-INV-2026-0001"
+                  placeholder="GW-INV-YYYY-XXXX"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Invoice Date</span>
+              <span class="field-value"
+                ><input id="inv_date" type="date"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Supply Date</span>
+              <span class="field-value"
+                ><input id="sup_date" type="date"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Job No.</span>
+              <span class="field-value"
+                ><input
+                  id="job_no"
+                  type="text"
+                  placeholder="[JOB NUMBER]"
+                  class="ph-text"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Job Date</span>
+              <span class="field-value"
+                ><input id="job_date" type="date"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">P.O. No.</span>
+              <span class="field-value"
+                ><input
+                  id="po_no"
+                  type="text"
+                  placeholder="[PO NUMBER / N/A]"
+                  class="ph-text"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Payment Terms</span>
+              <span class="field-value"
+                ><input
+                  id="pay_terms"
+                  type="text"
+                  placeholder="[e.g. Net 30 / Immediate]"
+                  class="ph-text"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Due Date</span>
+              <span class="field-value"
+                ><input id="due_date" type="date"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Currency</span>
+              <span class="field-value"
+                ><input
+                  type="text"
+                  value="AED – UAE Dirham"
+                  readonly
+                  style="color: var(--mid)"
+              /></span>
+            </div>
+          </div>
+          <!-- /invoice details -->
+
+          <!-- Customer / Bill To -->
+          <div class="info-col">
+            <h3>Bill To / Customer</h3>
+
+            <div class="field-row">
+              <span class="field-label">Customer Name</span>
+              <span class="field-value"
+                ><input
+                  id="cust_name"
+                  type="text"
+                  placeholder="[CUSTOMER LEGAL NAME]"
+                  class="ph-text"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Address</span>
+              <span class="field-value"
+                ><input
+                  id="cust_addr"
+                  type="text"
+                  placeholder="[BILLING ADDRESS]"
+                  class="ph-text"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Emirate</span>
+              <span class="field-value">
+                <select
+                  id="cust_emirate"
+                  style="
+                    font-family: inherit;
+                    font-size: 10px;
+                    border: none;
+                    border-bottom: 1px dashed #ccc;
+                    background: transparent;
+                    text-align: right;
+                    width: 100%;
+                    outline: none;
+                    color: var(--light);
+                    font-style: italic;
+                  "
+                >
+                  <option value="">— Select Emirate —</option>
+                  <option>Dubai</option>
+                  <option>Abu Dhabi</option>
+                  <option>Sharjah</option>
+                  <option>Ajman</option>
+                  <option>Umm Al Quwain</option>
+                  <option>Ras Al Khaimah</option>
+                  <option>Fujairah</option>
+                </select>
+              </span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Country</span>
+              <span class="field-value"
+                ><input
+                  type="text"
+                  value="United Arab Emirates"
+                  readonly
+                  style="color: var(--mid)"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Contact Person</span>
+              <span class="field-value"
+                ><input
+                  id="cust_contact"
+                  type="text"
+                  placeholder="[CONTACT NAME]"
+                  class="ph-text"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Contact No.</span>
+              <span class="field-value"
+                ><input
+                  id="cust_phone"
+                  type="text"
+                  placeholder="[PHONE NUMBER]"
+                  class="ph-text"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Customer TRN</span>
+              <span class="field-value"
+                ><input
+                  id="cust_trn"
+                  type="text"
+                  placeholder="[CUSTOMER TRN / N/A]"
+                  class="ph-text"
+              /></span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Email</span>
+              <span class="field-value"
+                ><input
+                  id="cust_email"
+                  type="email"
+                  placeholder="[CUSTOMER EMAIL]"
+                  class="ph-text"
+              /></span>
+            </div>
+          </div>
+          <!-- /bill to -->
+        </div>
+        <!-- /inv-info -->
+
+        <!-- SERVICE TABLE -->
+        <div class="inv-table-wrap">
+          <table class="inv-table" id="lineTable">
+            <thead>
+              <tr>
+                <th style="width: 26px">No.</th>
+                <th class="left" style="min-width: 130px">
+                  Description / Particulars
+                </th>
+                <th style="width: 36px">Qty</th>
+                <th style="width: 48px">Unit</th>
+                <th class="right" style="width: 72px">Unit Price (AED)</th>
+                <th class="right" style="width: 62px">Discount (AED)</th>
+                <th class="right" style="width: 72px">Taxable Amt (AED)</th>
+                <th style="width: 44px">VAT %</th>
+                <th class="right" style="width: 64px">VAT Amt (AED)</th>
+                <th class="right" style="width: 70px">Total (AED)</th>
+                <th style="width: 20px" class="no-print"></th>
+              </tr>
+            </thead>
+            <tbody id="lineBody">
+              <!-- rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TOTALS -->
+        <div class="inv-totals" style="margin-top: 10px; padding-top: 10px">
+          <table class="totals-table">
+            <tr>
+              <td class="tot-label">Subtotal (before discount)</td>
+              <td class="tot-val" id="t_subtotal">AED 0.00</td>
+            </tr>
+            <tr>
+              <td class="tot-label">Total Discount</td>
+              <td class="tot-val" id="t_discount">AED 0.00</td>
+            </tr>
+            <tr>
+              <td class="tot-label">Taxable Amount</td>
+              <td class="tot-val" id="t_taxable">AED 0.00</td>
+            </tr>
+            <tr>
+              <td class="tot-label">VAT (5%)</td>
+              <td class="tot-val" id="t_vat">AED 0.00</td>
+            </tr>
+            <tr class="tot-grand">
+              <td class="tot-label" style="color: #fff; font-weight: 700">
+                TOTAL AMOUNT DUE
+              </td>
+              <td
+                class="tot-val"
+                id="t_total"
+                style="font-size: 13px; letter-spacing: 0.02em"
+              >
+                AED 0.00
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <!-- AMOUNT IN WORDS -->
+        <div class="inv-words">
+          <div class="wlabel">Amount Chargeable in Words</div>
+          <div class="wtext" id="amtWords">UAE Dirhams Zero Only</div>
+        </div>
+
+        <!-- BANK DETAILS + PAYMENT TERMS -->
+        <div class="inv-bank-terms">
+          <div class="bank-col">
+            <h3>Bank Details</h3>
+            <div class="bank-field">
+              <span class="bl">Account Name</span
+              ><span class="bv">[COMPANY LEGAL NAME]</span>
+            </div>
+            <div class="bank-field">
+              <span class="bl">Bank Name</span
+              ><span class="bv">[BANK NAME]</span>
+            </div>
+            <div class="bank-field">
+              <span class="bl">Account No.</span
+              ><span class="bv">[ACCOUNT NUMBER]</span>
+            </div>
+            <div class="bank-field">
+              <span class="bl">IBAN</span><span class="bv">[AE — IBAN]</span>
+            </div>
+            <div class="bank-field">
+              <span class="bl">SWIFT / BIC</span
+              ><span class="bv">[SWIFT CODE]</span>
+            </div>
+            <div class="bank-field">
+              <span class="bl">Currency</span
+              ><span class="bv">AED – UAE Dirham</span>
+            </div>
+            <div class="bank-field">
+              <span class="bl">Branch</span
+              ><span class="bv">[BRANCH / CITY]</span>
+            </div>
+          </div>
+
+          <div class="bank-col">
+            <h3>Payment Terms & Method</h3>
+            <div class="bank-field" style="flex-direction: column; gap: 2px">
+              <span class="bl">Terms</span>
+              <span class="bv"
+                >Payment due within [XX] days from invoice date.</span
+              >
+            </div>
+            <div
+              class="bank-field"
+              style="flex-direction: column; gap: 2px; margin-top: 6px"
+            >
+              <span class="bl">Accepted Method(s)</span>
+              <span class="bv">Bank Transfer / [OTHER ACCEPTED METHODS]</span>
+            </div>
+            <div
+              class="bank-field"
+              style="flex-direction: column; gap: 2px; margin-top: 6px"
+            >
+              <span class="bl">Late Payment</span>
+              <span class="bv">[ENTER LATE PAYMENT POLICY / N/A]</span>
+            </div>
+          </div>
+        </div>
+        <!-- /bank-terms -->
+
+        <!-- REMARKS -->
+
+        <!-- AUTHORISED SIGNATORY -->
+        <div class="inv-sign">
+          <div class="sign-box">
+            <div class="sign-for">For</div>
+            <div class="sign-company">GREENWORLD [LEGAL COMPANY NAME]</div>
+            <div class="sign-area">Signature &amp; Company Stamp</div>
+            <div class="sign-lines">
+              <div><span>Authorized Signatory</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="inv-footer">
+          This is a computer-generated Tax Invoice. All amounts in UAE Dirhams
+          (AED). Subject to UAE VAT at 5% as applicable. &nbsp;|&nbsp;
+          GREENWORLD [LEGAL COMPANY NAME] &nbsp;|&nbsp; Dubai, UAE
+        </div>
+      </div>
+      <!-- /invoice -->
+    </div>
+    <!-- /page-wrap -->
+
+    <script>
+      // ── DATA ──────────────────────────────────────────────────────────
+      let rows = [
+        {
+          desc: "",
+          qty: 1,
+          unit: "Service",
+          unitPrice: 0,
+          discount: 0,
+          vatRate: 5,
+        },
+      ];
+
+      const UNITS = [
+        "Service",
+        "Hour",
+        "Day",
+        "Visit",
+        "Sq.Ft",
+        "Sq.Mtr",
+        "Unit",
+        "Item",
+        "Month",
+        "Contract",
+      ];
+
+      // ── RENDER TABLE ─────────────────────────────────────────────────
+      function renderTable() {
+        const tbody = document.getElementById("lineBody");
+        tbody.innerHTML = "";
+
+        rows.forEach((r, i) => {
+          const taxable = Math.max(0, r.qty * r.unitPrice - r.discount);
+          const vatAmt = taxable * (r.vatRate / 100);
+          const total = taxable + vatAmt;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+      <td class="num">${i + 1}</td>
+      <td class="left">
+        <input type="text" value="${escHtml(r.desc)}" placeholder="[SERVICE DESCRIPTION]"
+          oninput="rows[${i}].desc = this.value" style="min-width:120px">
+      </td>
+      <td>
+        <input type="number" min="0" step="0.01" value="${r.qty}"
+          oninput="rows[${i}].qty=+this.value||0;recalc()" style="width:36px;text-align:right">
+      </td>
+      <td>
+        <select onchange="rows[${i}].unit=this.value" style="font-family:inherit;font-size:9px;width:100%;border:none;border-bottom:1px dashed #ccc;background:transparent;outline:none;">
+          ${UNITS.map((u) => `<option${u === r.unit ? " selected" : ""}>${u}</option>`).join("")}
+        </select>
+      </td>
+      <td class="right">
+        <input type="number" min="0" step="0.01" value="${r.unitPrice.toFixed(2)}"
+          oninput="rows[${i}].unitPrice=+this.value||0;recalc()" style="width:68px;text-align:right">
+      </td>
+      <td class="right">
+        <input type="number" min="0" step="0.01" value="${r.discount.toFixed(2)}"
+          oninput="rows[${i}].discount=+this.value||0;recalc()" style="width:58px;text-align:right">
+      </td>
+      <td class="right" style="font-weight:600;">${fmt(taxable)}</td>
+      <td>
+        <select onchange="rows[${i}].vatRate=+this.value;recalc()" style="font-family:inherit;font-size:9px;width:100%;border:none;border-bottom:1px dashed #ccc;background:transparent;outline:none;text-align:center;">
+          <option value="5"${r.vatRate === 5 ? " selected" : ""}>5%</option>
+          <option value="0"${r.vatRate === 0 ? " selected" : ""}>0%</option>
+          <option value="exempt"${r.vatRate === "exempt" ? " selected" : ""}>Exempt</option>
+        </select>
+      </td>
+      <td class="right" style="font-weight:600;">${fmt(vatAmt)}</td>
+      <td class="right" style="font-weight:700;">${fmt(total)}</td>
+      <td><button class="del-btn" onclick="deleteRow(${i})" title="Remove">×</button></td>
+    `;
+          tbody.appendChild(tr);
+        });
+
+        recalc();
+      }
+
+      function escHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/"/g, "&quot;")
+          .replace(/</g, "&lt;");
+      }
+
+      // ── CALCULATIONS ─────────────────────────────────────────────────
+      function recalc() {
+        let subtotal = 0,
+          discount = 0,
+          taxable = 0,
+          vatTotal = 0,
+          total = 0;
+
+        rows.forEach((r) => {
+          const sub = r.qty * r.unitPrice;
+          const dis = Math.min(r.discount, sub);
+          const tax = Math.max(0, sub - dis);
+          const vat = tax * ((+r.vatRate || 0) / 100);
+          subtotal += sub;
+          discount += dis;
+          taxable += tax;
+          vatTotal += vat;
+          total += tax + vat;
+        });
+
+        document.getElementById("t_subtotal").textContent =
+          "AED " + fmt(subtotal);
+        document.getElementById("t_discount").textContent =
+          "AED " + fmt(discount);
+        document.getElementById("t_taxable").textContent =
+          "AED " + fmt(taxable);
+        document.getElementById("t_vat").textContent = "AED " + fmt(vatTotal);
+        document.getElementById("t_total").textContent = "AED " + fmt(total);
+        document.getElementById("amtWords").textContent =
+          "UAE Dirhams " + numberToWords(total) + " Only";
+
+        // re-render rows for computed cells
+        const cells = document.querySelectorAll("#lineBody tr");
+        cells.forEach((tr, i) => {
+          const r = rows[i];
+          if (!r) return;
+          const tax = Math.max(0, r.qty * r.unitPrice - r.discount);
+          const vat = tax * ((+r.vatRate || 0) / 100);
+          const tot = tax + vat;
+          const tds = tr.querySelectorAll("td");
+          if (tds[6]) tds[6].textContent = fmt(tax);
+          if (tds[8]) tds[8].textContent = fmt(vat);
+          if (tds[9]) tds[9].textContent = fmt(tot);
+        });
+      }
+
+      function fmt(n) {
+        return Number(n).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+      }
+
+      // ── ROW MANAGEMENT ────────────────────────────────────────────────
+      function addRow() {
+        rows.push({
+          desc: "",
+          qty: 1,
+          unit: "Service",
+          unitPrice: 0,
+          discount: 0,
+          vatRate: 5,
+        });
+        renderTable();
+      }
+
+      function deleteRow(i) {
+        if (rows.length === 1) {
+          rows[0] = {
+            desc: "",
+            qty: 1,
+            unit: "Service",
+            unitPrice: 0,
+            discount: 0,
+            vatRate: 5,
+          };
+          renderTable();
+          return;
+        }
+        rows.splice(i, 1);
+        renderTable();
+      }
+
+      function clearForm() {
+        if (!confirm("Clear all line items and reset totals?")) return;
+        rows = [
+          {
+            desc: "",
+            qty: 1,
+            unit: "Service",
+            unitPrice: 0,
+            discount: 0,
+            vatRate: 5,
+          },
+        ];
+        renderTable();
+      }
+
+      // ── NUMBER TO WORDS ───────────────────────────────────────────────
+      function numberToWords(num) {
+        if (num === 0) return "Zero";
+        const ones = [
+          "",
+          "One",
+          "Two",
+          "Three",
+          "Four",
+          "Five",
+          "Six",
+          "Seven",
+          "Eight",
+          "Nine",
+          "Ten",
+          "Eleven",
+          "Twelve",
+          "Thirteen",
+          "Fourteen",
+          "Fifteen",
+          "Sixteen",
+          "Seventeen",
+          "Eighteen",
+          "Nineteen",
+        ];
+        const tens = [
+          "",
+          "",
+          "Twenty",
+          "Thirty",
+          "Forty",
+          "Fifty",
+          "Sixty",
+          "Seventy",
+          "Eighty",
+          "Ninety",
+        ];
+
+        function convert(n) {
+          if (n < 20) return ones[n];
+          if (n < 100)
+            return (
+              tens[Math.floor(n / 10)] + (n % 10 ? " " + ones[n % 10] : "")
+            );
+          if (n < 1000)
+            return (
+              ones[Math.floor(n / 100)] +
+              " Hundred" +
+              (n % 100 ? " " + convert(n % 100) : "")
+            );
+          if (n < 1000000)
+            return (
+              convert(Math.floor(n / 1000)) +
+              " Thousand" +
+              (n % 1000 ? " " + convert(n % 1000) : "")
+            );
+          if (n < 1000000000)
+            return (
+              convert(Math.floor(n / 1000000)) +
+              " Million" +
+              (n % 1000000 ? " " + convert(n % 1000000) : "")
+            );
+          return (
+            convert(Math.floor(n / 1000000000)) +
+            " Billion" +
+            (n % 1000000000 ? " " + convert(n % 1000000000) : "")
+          );
+        }
+
+        const dirhams = Math.floor(num);
+        const fils = Math.round((num - dirhams) * 100);
+        let words = convert(dirhams);
+        if (fils > 0) words += " and " + convert(fils) + " Fils";
+        return words;
+      }
+
+      // ── INIT ──────────────────────────────────────────────────────────
+      document.addEventListener("DOMContentLoaded", () => {
+        // Default today's date
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("inv_date").value = today;
+        renderTable();
+      });
+    </script>
+  </body>
+</html>
